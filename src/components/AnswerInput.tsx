@@ -1,5 +1,6 @@
 'use client';
 import type { Answer, Question } from '../types';
+import { useId } from 'react';
 import { ArrowDown, ArrowUp, GripVertical } from 'lucide-react';
 
 export function AnswerInput({
@@ -13,6 +14,7 @@ export function AnswerInput({
   onChange: (a: Answer) => void;
   disabled?: boolean;
 }) {
+  const inputId = useId();
   if (['shortText', 'longText', 'caseStudy'].includes(q.type))
     return (
       <label className="text-answer">
@@ -35,6 +37,11 @@ export function AnswerInput({
     const map = value && typeof value === 'object' && !Array.isArray(value) ? value : {};
     return (
       <div>
+        <p className="answer-instruction">
+          {q.type === 'dragDrop'
+            ? 'Ziehe die Begriffe auf die passenden Zeilen oder wähle sie im Auswahlfeld aus.'
+            : 'Wähle für jede Zeile die passende Antwort im Auswahlfeld.'}
+        </p>
         {q.type === 'dragDrop' && (
           <div className="drag-bank">
             {q.options.map((option) => (
@@ -61,9 +68,9 @@ export function AnswerInput({
                 if (!disabled && q.options.includes(text)) onChange({ ...map, [row]: text });
               }}
             >
-              <label htmlFor={`${q.id}-${i}`}>{row}</label>
+              <label htmlFor={`${inputId}-${q.id}-${i}`}>{row}</label>
               <select
-                id={`${q.id}-${i}`}
+                id={`${inputId}-${q.id}-${i}`}
                 disabled={disabled}
                 value={map[row] ?? ''}
                 onChange={(e) => onChange({ ...map, [row]: e.target.value })}
@@ -88,6 +95,9 @@ export function AnswerInput({
     };
     return (
       <div className="ordering">
+        <p className="answer-instruction">
+          Verschiebe die Schritte mit ↑ und ↓ in die richtige Reihenfolge.
+        </p>
         {order.map((o, i) => (
           <div key={o}>
             <span className="order-number">{i + 1}</span>
@@ -120,7 +130,11 @@ export function AnswerInput({
   }
   return (
     <fieldset className="choices">
-      <legend className="sr-only">Antwort auswählen</legend>
+      <legend className="answer-instruction">
+        {q.type === 'multipleChoice'
+          ? 'Mehrere Antworten sind möglich. Wähle alle zutreffenden Aussagen.'
+          : 'Wähle genau eine Antwort.'}
+      </legend>
       {q.options.map((o, i) => {
         const checked =
           q.type === 'multipleChoice' ? Array.isArray(value) && value.includes(o) : value === o;
@@ -129,7 +143,7 @@ export function AnswerInput({
             <span className="choice-letter">{String.fromCharCode(65 + i)}</span>
             <input
               type={q.type === 'multipleChoice' ? 'checkbox' : 'radio'}
-              name={q.id}
+              name={`${inputId}-${q.id}`}
               disabled={disabled}
               checked={checked}
               onChange={() => {

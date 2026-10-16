@@ -23,14 +23,20 @@ import { topics } from '../content/topics';
 import { demoExam } from '../content/exams';
 import { evaluate } from '../lib/grading';
 import { emptyProgress, localRepository } from '../lib/storage';
+import { locationHash, readLocation, type Page } from '../lib/navigation';
+import { LearningPath } from './LearningPath';
 import type { ExamSession, Progress, TopicId } from '../types';
 
-type Page = 'dashboard' | 'learning' | 'training' | 'exam';
 const nav = [
-  { id: 'dashboard', label: 'Übersicht', icon: LayoutDashboard, detail: '01' },
-  { id: 'learning', label: 'Lernen', icon: BookOpen, detail: '02' },
-  { id: 'training', label: 'Trainieren', icon: Target, detail: '03' },
-  { id: 'exam', label: 'Prüfung', icon: GraduationCap, detail: '04' },
+  { id: 'dashboard', label: 'Start', icon: LayoutDashboard, detail: 'Dein nächster Lernschritt' },
+  { id: 'learning', label: 'Lernen', icon: BookOpen, detail: 'Themen und Beispiele verstehen' },
+  { id: 'training', label: 'Üben', icon: Target, detail: 'Aufgaben mit direktem Feedback' },
+  {
+    id: 'exam',
+    label: 'Prüfung',
+    icon: GraduationCap,
+    detail: 'Dein Wissen unter Zeitdruck testen',
+  },
 ] as const;
 
 export default function App() {
@@ -44,10 +50,24 @@ export default function App() {
   const [mobile, setMobile] = useState(false);
   const [help, setHelp] = useState(false);
   useEffect(() => {
+    const restoreLocation = () => {
+      const location = readLocation(window.location.hash);
+      setPage(location?.page ?? 'dashboard');
+      if (location) {
+        if (
+          location.page === 'learning' ||
+          (location.page === 'training' && location.trainingTopic !== 'all')
+        )
+          setTopic(location.topic);
+        if (location.page === 'training') setTrainingTopic(location.trainingTopic);
+      }
+      setMobile(false);
+    };
     try {
       const p = localRepository.load();
       setProgress(p);
-      if (p.activeExam) setPage('exam');
+      if (readLocation(window.location.hash)) restoreLocation();
+      else if (p.activeExam) setPage('exam');
     } catch {
       setCanSave(false);
       setStorageError(
@@ -55,6 +75,12 @@ export default function App() {
       );
     }
     setReady(true);
+    window.addEventListener('popstate', restoreLocation);
+    window.addEventListener('hashchange', restoreLocation);
+    return () => {
+      window.removeEventListener('popstate', restoreLocation);
+      window.removeEventListener('hashchange', restoreLocation);
+    };
   }, []);
   useEffect(() => {
     if (!ready || !canSave) return;
@@ -102,23 +128,32 @@ export default function App() {
     const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
   }, [progress.activeExam, page, finalize]);
-  const go = (next: Page) => {
+  const go = (next: Page, nextTopic = topic, nextTrainingTopic = trainingTopic) => {
     setPage(next);
+    setTopic(nextTopic);
+    setTrainingTopic(nextTrainingTopic);
+    const hash = locationHash(next, nextTopic, nextTrainingTopic);
+    if (window.location.hash !== hash) window.history.pushState(null, '', hash);
     setMobile(false);
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
   const learn = (id: TopicId) => {
-    setTopic(id);
-    go('learning');
+    go('learning', id);
   };
   const train = (id: TopicId | 'all') => {
-    setTrainingTopic(id);
-    go('training');
+    go('training', id === 'all' ? topic : id, id);
   };
   const data = analytics(progress);
   return (
     <div className="app-shell">
-      <a className="skip-link" href="#main">
+      <a
+        className="skip-link"
+        href="#main"
+        onClick={(e) => {
+          e.preventDefault();
+          document.getElementById('main')?.focus();
+        }}
+      >
         Zum Inhalt
       </a>
       <aside className={`sidebar ${mobile ? 'open' : ''}`}>
@@ -134,7 +169,7 @@ export default function App() {
           <span className="brand-dot" />
         </a>
         <div className="workspace-label">DEIN WISSEN. DEIN VORSPRUNG.</div>
-        <div className="sidebar-section">WORKSPACE</div>
+        <div className="sidebar-section">DEINE WISO-VORBEREITUNG</div>
         <nav aria-label="Hauptnavigation">
           {nav.map((item) => (
             <button
@@ -144,8 +179,10 @@ export default function App() {
               onClick={() => go(item.id)}
             >
               <item.icon size={18} strokeWidth={1.6} />
-              <span>{item.label}</span>
-              <small>{item.detail}</small>
+              <span>
+                <strong>{item.label}</strong>
+                <small>{item.detail}</small>
+              </span>
             </button>
           ))}
         </nav>
@@ -193,7 +230,9 @@ export default function App() {
             >
               {mobile ? <X size={20} /> : <Menu size={20} />}
             </button>
-            <span>Workspace</span>
+            <button className="breadcrumb-home" onClick={() => go('dashboard')}>
+              Startseite
+            </button>
             <ChevronRight size={13} />
             <strong>{nav.find((n) => n.id === page)?.label}</strong>
           </div>
@@ -236,6 +275,14 @@ export default function App() {
             <div className="loading">Dein Lernraum wird vorbereitet …</div>
           ) : (
             <>
+              {page !== 'dashboard' && (
+                <LearningPath
+                  current={page}
+                  onLearn={() => learn(topic)}
+                  onTrain={() => train(topic)}
+                  onExam={() => go('exam')}
+                />
+              )}
               {page === 'dashboard' && (
                 <Dashboard
                   progress={progress}
@@ -246,7 +293,9 @@ export default function App() {
               )}
               {page === 'learning' && (
                 <Learning
+                  key={topic}
                   initialTopic={topic}
+                  onTopicChange={learn}
                   completed={progress.lessons}
                   onComplete={(id) =>
                     setProgress((p) => ({
@@ -259,9 +308,15 @@ export default function App() {
                   onExam={() => go('exam')}
                 />
               )}
-              {page === 'training' && (
+              <div hidden={page !== 'training'}>
                 <Training
+                  active={page === 'training'}
+                  key={trainingTopic}
                   initialTopic={trainingTopic}
+                  onTopicChange={train}
+                  onLearn={() => learn(topic)}
+                  onExam={() => go('exam')}
+                  onHome={() => go('dashboard')}
                   onAttempt={(a) =>
                     setProgress((p) => ({
                       ...p,
@@ -270,7 +325,7 @@ export default function App() {
                     }))
                   }
                 />
-              )}
+              </div>
               {page === 'exam' && (
                 <Exam
                   session={progress.activeExam}
@@ -309,6 +364,18 @@ export default function App() {
           </footer>
         </main>
       </div>
+      <nav className="mobile-bottom-nav" aria-label="Schnellnavigation">
+        {nav.map((item) => (
+          <button
+            key={item.id}
+            aria-current={page === item.id ? 'page' : undefined}
+            onClick={() => go(item.id)}
+          >
+            <item.icon size={19} />
+            <span>{item.label}</span>
+          </button>
+        ))}
+      </nav>
     </div>
   );
 }
@@ -329,6 +396,8 @@ function Dashboard({
   const activity = [...progress.attempts].reverse().slice(0, 4);
   const latestLesson = Object.entries(progress.lessons).sort((a, b) => b[1] - a[1])[0];
   const trend = progress.attempts.slice(-12);
+  const nextTopic = topics.find((t) => !progress.lessons[t.id]) ?? recommended;
+  const continueTraining = lessonCount === topics.length;
   const points = trend
     .map(
       (a, i) => `${14 + i * (252 / Math.max(1, trend.length - 1))},${69 - (a.earned / a.max) * 50}`,
@@ -339,16 +408,110 @@ function Dashboard({
       <div className="dashboard-heading">
         <div>
           <span className="eyebrow">DEIN PERSÖNLICHER LERNRAUM</span>
-          <h1>
-            Verstehen. Anwenden.
-            <br />
-            <span>Sicher bestehen.</span>
-          </h1>
-          <p>Dein nächster Schritt beginnt mit einem klaren Überblick.</p>
+          <h1>{lessonCount ? 'Dein nächster Lernschritt.' : 'Starte deine WISO-Vorbereitung.'}</h1>
+          <p>Erst verstehen, dann üben, zum Schluss unter Prüfungsbedingungen testen.</p>
         </div>
         <span className="edition">
           WISO ESSENTIALS<span>EDITION 01 / FACHINFORMATIK</span>
         </span>
+      </div>
+      <div className="start-panel">
+        <div className="start-copy">
+          <span className="eyebrow">
+            {progress.activeExam
+              ? 'DEINE PRÜFUNG LÄUFT WEITER'
+              : continueTraining
+                ? 'EMPFOHLEN FÜR DICH'
+                : `SCHRITT 1 · ${nextTopic.minutes} MINUTEN`}
+          </span>
+          <h2>
+            {progress.activeExam
+              ? 'Setze deine Prüfung fort.'
+              : continueTraining
+                ? `${recommended.title} üben`
+                : `${nextTopic.title} verstehen`}
+          </h2>
+          <p>
+            {progress.activeExam
+              ? 'Deine Antworten sind gespeichert. Die Prüfungszeit läuft weiter.'
+              : continueTraining
+                ? 'Wende das Gelernte an. Du bekommst nach jeder Aufgabe eine Erklärung.'
+                : 'Eine kurze Erklärung, ein interaktives Beispiel und eine kleine Aufgabe. Du brauchst kein Vorwissen.'}
+          </p>
+          <button
+            className="button primary"
+            onClick={() =>
+              progress.activeExam
+                ? exam()
+                : continueTraining
+                  ? train(recommended.id)
+                  : learn(nextTopic.id)
+            }
+          >
+            {progress.activeExam
+              ? 'Prüfung fortsetzen'
+              : continueTraining
+                ? 'Training starten'
+                : 'Jetzt mit dem Lernen beginnen'}
+            <ArrowRight size={17} />
+          </button>
+        </div>
+        <ol className="start-checklist">
+          <li className={lessonCount ? 'done' : 'current'}>
+            <span>{lessonCount ? <Check size={16} /> : '1'}</span>
+            <div>
+              <strong>Thema verstehen</strong>
+              <p>Matrix und Beispiele entdecken</p>
+            </div>
+          </li>
+          <li className={progress.attempts.length ? 'done' : ''}>
+            <span>{progress.attempts.length ? <Check size={16} /> : '2'}</span>
+            <div>
+              <strong>Mit Aufgaben üben</strong>
+              <p>Feedback direkt nach jeder Antwort</p>
+            </div>
+          </li>
+          <li className={progress.exams.length ? 'done' : ''}>
+            <span>{progress.exams.length ? <Check size={16} /> : '3'}</span>
+            <div>
+              <strong>Prüfung ausprobieren</strong>
+              <p>20 Aufgaben in 30 Minuten</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+      <div className="quick-actions" aria-label="Direkt starten">
+        <button onClick={() => learn(nextTopic.id)}>
+          <BookOpen size={20} />
+          <span>
+            <strong>Thema lernen</strong>
+            <small>In Ruhe verstehen · 8–10 Min.</small>
+          </span>
+          <ArrowRight size={17} />
+        </button>
+        <button onClick={() => train('all')}>
+          <Target size={20} />
+          <span>
+            <strong>Aufgaben üben</strong>
+            <small>15 Aufgaben · mit Erklärungen</small>
+          </span>
+          <ArrowRight size={17} />
+        </button>
+        <button onClick={exam}>
+          <GraduationCap size={20} />
+          <span>
+            <strong>Prüfung testen</strong>
+            <small>20 Aufgaben · 30 Min. · ohne Tipps</small>
+          </span>
+          <ArrowRight size={17} />
+        </button>
+      </div>
+      <div className="section-title progress-heading">
+        <div>
+          <span className="eyebrow">DEIN BISHERIGER STAND</span>
+          <h2>So kommst du voran.</h2>
+        </div>
+        <span className="caption">Deine Ergebnisse werden automatisch gespeichert.</span>
       </div>
       <div className="hero-grid">
         <div className="readiness-panel">
@@ -426,7 +589,7 @@ function Dashboard({
                   : 'Deine Quote basiert auf den letzten 20 bewerteten Antworten je Thema. Sie ist eine Lernorientierung, keine Bestehensprognose.'}
               </p>
               <button className="text-button gold" onClick={() => train('all')}>
-                {readiness === null ? 'Wissensstand ermitteln' : 'Weiter trainieren'}
+                {readiness === null ? 'Übungsaufgaben starten' : 'Weiter üben'}
                 <ArrowRight size={17} />
               </button>
             </div>
@@ -470,7 +633,7 @@ function Dashboard({
             {recommended.minutes} Minuten<span>·</span>Interaktives Lernmodul
           </div>
           <button className="button primary full" onClick={() => learn(recommended.id)}>
-            Lerneinheit öffnen <ArrowRight size={17} />
+            {recommended.title} lernen <ArrowRight size={17} />
           </button>
         </aside>
       </div>
@@ -545,11 +708,11 @@ function Dashboard({
               </div>
               <strong>{t.percent === null ? '—' : `${t.percent}%`}</strong>
               <button
-                className="icon-button"
-                aria-label={`${t.title} trainieren`}
+                className="text-button"
+                aria-label={`${t.title} üben`}
                 onClick={() => train(t.id)}
               >
-                <ArrowRight size={17} />
+                Üben <ArrowRight size={17} />
               </button>
             </div>
           ))}

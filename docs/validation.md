@@ -22,3 +22,12 @@ Stand: 15.10.2026. Umgebung: Windows, Node.js 24.21, npm 11.19; Next.js 16.4, Re
 - Der Slice enthält genau zwei vollständige Themenmodule; der weitere fachliche Umfang ist in `curriculum.md` geplant.
 
 Die generierten Testbilder, PDF-Dateien und Traces liegen ausschließlich im ignorierten Verzeichnis `test-results/`.
+
+## Nutzerführung überarbeitet am 16.10.2026
+
+- Einheitliche Navigation „Start · Lernen · Üben · Prüfung“ mit verständlichen Beschreibungen; auf schmalen Ansichten feste Navigation am unteren Rand.
+- Konkreter erster Lernschritt vor den Kennzahlen, direkt beschriftete Einstiege und eine Schrittleiste zwischen Verstehen, Üben und Prüfen.
+- Bedienhinweise für die interaktiven Lektionen und Aufgabentypen, Bestätigung beim Lektionsabschluss und klare nächste Aktionen.
+- URL-Fragmente für Themen und Ansichten; Browser-Zurück sowie Neuladen bleiben in der gewählten Ansicht. Beim Nachlesen bleibt die aktuelle Trainingsantwort innerhalb der laufenden Anwendung erhalten.
+- In der Prüfung führen „Nächste Aufgabe“ und zuletzt „Zur Abgabe“ durch die Bearbeitung.
+- Produktions-Build und TypeScript erfolgreich; zwölf Logiktests sowie 14 Desktop-/Mobil-Browsertests bestanden, darunter direkte Einstiege, Zurück-Navigation und der Wechsel zwischen Nachlesen und Üben.

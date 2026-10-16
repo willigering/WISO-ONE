@@ -2784,3 +2784,453 @@ main {
     scroll-behavior: auto !important;
   }
 }
+
+/* Clear actions and orientation across the learning journey. */
+.breadcrumb-home {
+  color: var(--muted);
+  padding: 6px 0;
+  font-size: 12px;
+}
+.breadcrumb-home:hover {
+  color: var(--gold);
+}
+.nav-item > span {
+  min-width: 0;
+}
+.nav-item strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+}
+.nav-item > span > small {
+  display: block;
+  color: #9aa3a5;
+  font-size: 10px;
+  line-height: 1.5;
+  margin: 5px 0 0;
+}
+.nav-item.active > span > small {
+  color: #c5b28b;
+}
+.dashboard-heading h1 {
+  font-size: clamp(30px, 3vw, 44px);
+  letter-spacing: -1.7px;
+  max-width: 750px;
+}
+.dashboard-heading .edition {
+  display: none;
+}
+.start-panel {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 45px;
+  border: 1px solid #6a5a3e;
+  background: linear-gradient(120deg, #2b2b24, #1c2221);
+  border-radius: 9px;
+  padding: 32px;
+}
+.start-copy > .eyebrow {
+  color: var(--gold);
+}
+.start-copy h2 {
+  margin: 12px 0;
+  font-size: 30px;
+}
+.start-copy p {
+  font-size: 14px;
+  max-width: 560px;
+}
+.start-copy > .button {
+  margin-top: 23px;
+  font-size: 13px;
+}
+.start-checklist {
+  list-style: none;
+  padding: 0 0 0 30px;
+  margin: 0;
+  border-left: 1px solid #45463c;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 22px;
+}
+.start-checklist li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.start-checklist li > span {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #63675e;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: #adb5ab;
+  font-size: 12px;
+}
+.start-checklist .current > span {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #222;
+}
+.start-checklist .done > span {
+  color: var(--green);
+  border-color: #789983;
+}
+.start-checklist strong {
+  font-size: 13px;
+}
+.start-checklist p {
+  font-size: 11px;
+  margin-top: 3px;
+}
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+.quick-actions > button {
+  display: flex;
+  gap: 13px;
+  align-items: center;
+  padding: 19px 16px;
+  text-align: left;
+  border: 1px solid #42494a;
+  border-radius: 6px;
+  background: var(--surface);
+}
+.quick-actions > button:hover {
+  border-color: var(--gold);
+  background: #242822;
+}
+.quick-actions > button > svg:first-child {
+  color: var(--gold);
+}
+.quick-actions > button > svg:last-child {
+  margin-left: auto;
+  color: #adb4ac;
+}
+.quick-actions strong {
+  display: block;
+  font-size: 13px;
+}
+.quick-actions small {
+  display: block;
+  margin-top: 6px;
+  color: #a4adaf;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.progress-heading {
+  margin-top: 36px;
+}
+.hero-grid {
+  grid-template-columns: minmax(0, 1.9fr) minmax(260px, 1fr);
+}
+.learning-path {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1px solid #41494a;
+  border-radius: 7px;
+  margin-bottom: 30px;
+  background: var(--surface);
+}
+.learning-path button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  text-align: left;
+  min-width: 0;
+}
+.learning-path button + button {
+  border-left: 1px solid var(--border);
+}
+.learning-path button:hover {
+  background: #ffffff05;
+}
+.learning-path button[aria-current] {
+  background: #ddba7910;
+}
+.path-number {
+  color: var(--muted);
+  border: 1px solid #4a5555;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.learning-path button[aria-current] .path-number {
+  color: #222;
+  background: var(--gold);
+  border-color: var(--gold);
+}
+.learning-path strong {
+  display: block;
+  font-size: 13px;
+}
+.learning-path small {
+  display: block;
+  font-size: 11px;
+  color: #a1abad;
+  margin-top: 4px;
+}
+.learning-path button > svg {
+  margin-left: auto;
+  color: #788383;
+}
+.lesson-guide {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 25px;
+  background: #a8bfd70a;
+  border: 1px solid #405359;
+  padding: 22px;
+  border-radius: 6px;
+  margin: 25px 0;
+}
+.lesson-guide h3 {
+  font-size: 19px;
+  margin: 6px 0 10px;
+  letter-spacing: -0.4px;
+}
+.lesson-guide p {
+  font-size: 13px;
+  color: #b6c0c3;
+}
+.lesson-guide details {
+  font-size: 12px;
+  color: #bdc5c5;
+  align-self: center;
+}
+.lesson-guide summary {
+  color: var(--text);
+}
+.lesson-guide ul {
+  padding-left: 18px;
+  margin-bottom: 0;
+  line-height: 1.9;
+}
+.completion-message {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  color: var(--green);
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+.lesson-footer > button:disabled {
+  opacity: 0.75;
+}
+.training-orientation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin: -8px 0 23px;
+  font-size: 12px;
+  color: #aeb8b9;
+}
+.training-orientation > span:first-child {
+  color: var(--text);
+}
+.training-orientation > .text-button {
+  margin-left: auto;
+}
+.answer-instruction {
+  display: block;
+  width: 100%;
+  font-size: 12px;
+  color: #b3bebe;
+  margin: 0 0 14px;
+  line-height: 1.7;
+}
+.input-prompt {
+  margin-top: 12px;
+  font-size: 12px;
+  color: #a4aeb0;
+}
+.mobile-bottom-nav {
+  display: none;
+}
+@media (max-width: 1100px) {
+  .quick-actions {
+    grid-template-columns: 1fr;
+    gap: 9px;
+  }
+  .quick-actions > button {
+    padding: 14px 17px;
+  }
+  .quick-actions small {
+    margin-top: 3px;
+  }
+  .start-panel {
+    gap: 25px;
+    padding: 27px;
+    grid-template-columns: 1.3fr 1fr;
+  }
+  .start-checklist {
+    padding-left: 23px;
+  }
+  .start-copy h2 {
+    font-size: 26px;
+  }
+  .hero-grid {
+    grid-template-columns: 1fr;
+  }
+  .learning-path button {
+    padding: 13px;
+    gap: 9px;
+  }
+  .learning-path small {
+    font-size: 10px;
+  }
+  .learning-path button > svg {
+    display: none;
+  }
+}
+@media (max-width: 800px) {
+  .start-panel {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .start-checklist {
+    border-left: 0;
+    border-top: 1px solid #45463c;
+    padding: 23px 0 0;
+    gap: 17px;
+  }
+  .start-copy p {
+    font-size: 13px;
+  }
+  .lesson-guide {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .learning-path small {
+    display: none;
+  }
+}
+@media (max-width: 700px) {
+  .mobile-bottom-nav {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 40;
+    background: #1a2022f5;
+    backdrop-filter: blur(15px);
+    border-top: 1px solid #4b5352;
+    padding: 6px 8px max(8px, env(safe-area-inset-bottom));
+  }
+  .mobile-bottom-nav button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 5px;
+    color: #b1babb;
+    border-radius: 5px;
+    font-size: 11px;
+  }
+  .mobile-bottom-nav button[aria-current] {
+    color: var(--gold);
+    background: #ddba7910;
+  }
+  .sidebar {
+    z-index: 60;
+  }
+  .sidebar.open + .sidebar-backdrop {
+    z-index: 55;
+  }
+  main {
+    padding-bottom: 85px;
+  }
+  .app-footer {
+    margin-bottom: 12px;
+  }
+  .dashboard-heading h1 {
+    font-size: 34px;
+    letter-spacing: -1px;
+  }
+  .dashboard-heading p {
+    font-size: 13px;
+  }
+  .start-panel {
+    padding: 23px;
+  }
+  .start-copy h2 {
+    font-size: 26px;
+  }
+  .start-copy > .button {
+    width: 100%;
+    font-size: 12px;
+    padding: 13px 10px;
+  }
+  .start-checklist strong {
+    font-size: 13px;
+  }
+  .start-checklist p {
+    font-size: 12px;
+  }
+  .learning-path {
+    margin-bottom: 25px;
+  }
+  .learning-path button {
+    justify-content: center;
+    gap: 7px;
+    padding: 13px 6px;
+  }
+  .learning-path strong {
+    font-size: 11px;
+  }
+  .path-number {
+    width: 22px;
+    height: 22px;
+    font-size: 10px;
+  }
+  .lesson-guide {
+    padding: 18px;
+  }
+  .lesson-guide h3 {
+    font-size: 18px;
+  }
+  .lesson-guide p {
+    font-size: 12px;
+  }
+  .lesson-footer {
+    align-items: stretch;
+  }
+  .lesson-footer > .button {
+    width: 100%;
+    font-size: 12px;
+    padding: 13px;
+  }
+  .training-orientation {
+    gap: 8px;
+  }
+  .training-orientation > span:nth-child(2) {
+    width: 100%;
+    font-size: 11px;
+  }
+  .training-orientation > .text-button {
+    margin-left: 0;
+  }
+  .exam-actions > div {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .exam-actions .button {
+    font-size: 11px;
+    padding: 11px 12px;
+  }
+}

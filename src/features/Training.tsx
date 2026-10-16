@@ -1,17 +1,27 @@
 'use client';
 import { useState } from 'react';
-import { ArrowRight, RotateCcw } from 'lucide-react';
+import { ArrowRight, BookOpen, RotateCcw } from 'lucide-react';
 import { trainingQuestions } from '../content/questions';
 import { AnswerInput } from '../components/AnswerInput';
 import { answered, answerText, isOpen, score } from '../lib/grading';
 import type { Answer, Attempt, TopicId } from '../types';
 
 export function Training({
+  active,
   initialTopic,
   onAttempt,
+  onTopicChange,
+  onLearn,
+  onExam,
+  onHome,
 }: {
+  active: boolean;
   initialTopic: TopicId | 'all';
   onAttempt: (a: Attempt) => void;
+  onTopicChange: (id: TopicId | 'all') => void;
+  onLearn: () => void;
+  onExam: () => void;
+  onHome: () => void;
 }) {
   const [filter, setFilter] = useState<TopicId | 'all'>(initialTopic);
   const [index, setIndex] = useState(0);
@@ -27,32 +37,43 @@ export function Training({
     setConfidence(2);
   };
   const earned = score(q, value);
+  if (!active) return null;
   if (finished)
     return (
       <section className="finish-training page-enter">
         <span className="eyebrow">TRAINING ABGESCHLOSSEN</span>
-        <h1>Ein Stück sicherer.</h1>
+        <h1>Training abgeschlossen.</h1>
         <p className="lede">
           Du hast {items.length} Aufgaben bearbeitet. Deine geschlossenen Antworten sind in deinem
           Lernprofil gespeichert. Freitext bleibt zur eigenen Reflexion.
         </p>
-        <button
-          className="button primary"
-          onClick={() => {
-            setIndex(0);
-            setFinished(false);
-            reset();
-          }}
-        >
-          <RotateCcw size={16} /> Neue Trainingsrunde
-        </button>
+        <div className="button-row">
+          <button className="button primary" onClick={onHome}>
+            Meinen Fortschritt ansehen <ArrowRight size={16} />
+          </button>
+          <button className="button secondary" onClick={onExam}>
+            Zur Prüfungsübersicht
+          </button>
+          <button
+            className="text-button"
+            onClick={() => {
+              setIndex(0);
+              setFinished(false);
+              reset();
+            }}
+          >
+            <RotateCcw size={16} /> Neue Trainingsrunde
+          </button>
+        </div>
       </section>
     );
   return (
     <section className="page-enter">
       <div className="eyebrow">WISSEN WIRD KÖNNEN</div>
-      <h1>Dein Trainingsraum.</h1>
-      <p className="lede">Ausprobieren. Verstehen. Beim nächsten Mal wissen.</p>
+      <h1>Üben mit direktem Feedback.</h1>
+      <p className="lede">
+        Beantworte eine Aufgabe und klicke auf „Antwort prüfen“. Danach siehst du die Erklärung.
+      </p>
       <div className="tabs">
         {(['all', 'marktformen', 'kaufmann'] as const).map((t) => (
           <button
@@ -63,6 +84,7 @@ export function Training({
               setFilter(t);
               setIndex(0);
               reset();
+              onTopicChange(t);
             }}
           >
             {t === 'all'
@@ -72,6 +94,18 @@ export function Training({
                 : 'Kaufmannseigenschaft'}
           </button>
         ))}
+      </div>
+      <div className="training-orientation">
+        <span>
+          Aufgabe{' '}
+          <strong>
+            {index + 1} von {items.length}
+          </strong>
+        </span>
+        <span>Ohne Zeitlimit · Lösungen nach jeder Antwort</span>
+        <button className="text-button" onClick={onLearn}>
+          <BookOpen size={15} /> Thema noch einmal nachlesen
+        </button>
       </div>
       <div className="training-layout">
         <article className="question-panel">
@@ -125,6 +159,15 @@ export function Training({
                 {isOpen(q) ? 'Mit Musterlösung vergleichen' : 'Antwort prüfen'}
                 <ArrowRight size={16} />
               </button>
+              {!answered(value) && (
+                <p className="input-prompt">
+                  {q.type === 'ordering'
+                    ? 'Sortiere die Schritte mit den Pfeilen oder übernimm die angezeigte Reihenfolge.'
+                    : isOpen(q)
+                      ? 'Schreibe zuerst deine Begründung in das Textfeld.'
+                      : 'Wähle zuerst deine Antwort aus.'}
+                </p>
+              )}
             </>
           )}
           {checked && (

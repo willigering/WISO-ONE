@@ -18,7 +18,7 @@ test('learning, local progress, training and responsive layout', async ({ page }
   });
   await page.goto('/');
   await expect(
-    page.getByRole('heading', { name: 'Verstehen. Anwenden. Sicher bestehen.' }),
+    page.getByRole('heading', { name: 'Starte deine WISO-Vorbereitung.' }),
   ).toBeVisible();
   await page.screenshot({
     path: `test-results/dashboard-${info.project.name}.png`,
@@ -46,11 +46,13 @@ test('learning, local progress, training and responsive layout', async ({ page }
   await expect(page.getByRole('heading', { name: 'Kannkaufmann nach § 3 HGB' })).toBeVisible();
   await page.screenshot({ path: `test-results/decision-${info.project.name}.png`, fullPage: true });
   await page.reload();
-  await navigate(page, 'Trainieren');
+  await navigate(page, 'Üben');
   await page.getByLabel('Angebotsoligopol', { exact: false }).check();
   await page.getByRole('button', { name: 'Antwort prüfen' }).click();
   await expect(page.getByRole('status')).toContainText('5 / 5 PUNKTE');
   await page.reload();
+  await expect(page.getByRole('heading', { name: 'Üben mit direktem Feedback.' })).toBeVisible();
+  await navigate(page, 'Start');
   await expect(page.getByRole('img', { name: '100 Prozent Trainingsquote' })).toBeVisible();
   await expect(page.getByText('Lektion abgeschlossen', { exact: true })).toBeVisible();
   expect(errors).toEqual([]);
@@ -65,7 +67,7 @@ test('exam resumes, hides solutions, submits, exports and retains history', asyn
   await page.getByRole('button', { name: 'Prüfung jetzt starten' }).click();
   await page.getByLabel('Angebotsoligopol', { exact: false }).check();
   await page.getByRole('button', { name: 'Für später markieren' }).click();
-  await page.getByRole('button', { name: 'Weiter', exact: true }).click();
+  await page.getByRole('button', { name: 'Nächste Aufgabe', exact: true }).click();
   await page.reload();
   await expect(page.getByRole('heading', { name: questions[1].question })).toBeVisible();
   await page.getByRole('button', { name: 'Aufgabe 1, markiert', exact: true }).click();
@@ -133,7 +135,7 @@ test('all ten question types accept and retain complete exam answers', async ({ 
         .check();
     }
     if (index < questions.length - 1)
-      await page.getByRole('button', { name: 'Weiter', exact: true }).click();
+      await page.getByRole('button', { name: 'Nächste Aufgabe', exact: true }).click();
   }
   await page.reload();
   await expect(page.getByText('20 von 20 beantwortet · 0 markiert')).toBeVisible();
@@ -147,7 +149,7 @@ test('all ten question types accept and retain complete exam answers', async ({ 
 test('a corrupt saved answer is reported without destroying saved data', async ({ page }) => {
   await page.goto('/');
   await expect(
-    page.getByRole('heading', { name: 'Verstehen. Anwenden. Sicher bestehen.' }),
+    page.getByRole('heading', { name: 'Starte deine WISO-Vorbereitung.' }),
   ).toBeVisible();
   const broken = JSON.stringify({
     version: 1,
@@ -173,7 +175,7 @@ test('a corrupt saved answer is reported without destroying saved data', async (
 test('deadline expires exactly once and remains effective after reload', async ({ page }) => {
   await page.goto('/');
   await expect(
-    page.getByRole('heading', { name: 'Verstehen. Anwenden. Sicher bestehen.' }),
+    page.getByRole('heading', { name: 'Starte deine WISO-Vorbereitung.' }),
   ).toBeVisible();
   await page.evaluate(
     ({ examId }) => {

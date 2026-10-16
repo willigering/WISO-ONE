@@ -193,14 +193,18 @@ export function Exam({
                 disabled={session.current === 0}
                 onClick={() => onUpdate({ ...session, current: session.current - 1 })}
               >
-                <ArrowLeft size={16} />
+                <ArrowLeft size={16} /> Zurück
               </button>
               <button
                 className="button primary"
-                disabled={session.current === questions.length - 1}
-                onClick={() => onUpdate({ ...session, current: session.current + 1 })}
+                onClick={() =>
+                  session.current === questions.length - 1
+                    ? setConfirm(true)
+                    : onUpdate({ ...session, current: session.current + 1 })
+                }
               >
-                Weiter <ArrowRight size={16} />
+                {session.current === questions.length - 1 ? 'Zur Abgabe' : 'Nächste Aufgabe'}{' '}
+                <ArrowRight size={16} />
               </button>
             </div>
           </div>

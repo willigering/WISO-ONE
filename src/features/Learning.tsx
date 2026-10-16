@@ -6,18 +6,20 @@ import type { TopicId } from '../types';
 
 export function Learning({
   initialTopic,
+  onTopicChange,
   completed,
   onComplete,
   onTrain,
   onExam,
 }: {
   initialTopic: TopicId;
+  onTopicChange: (id: TopicId) => void;
   completed: Record<string, number>;
   onComplete: (id: string) => void;
   onTrain: (id: TopicId) => void;
   onExam: () => void;
 }) {
-  const [topic, setTopic] = useState<TopicId>(initialTopic);
+  const topic = initialTopic;
   const [selected, setSelected] = useState(8);
   const [preview, setPreview] = useState<number | null>(null);
   const [mini, setMini] = useState<string | null>(null);
@@ -29,15 +31,15 @@ export function Learning({
   return (
     <section className="page-enter">
       <div className="eyebrow">DEIN LERNRAUM</div>
-      <h1>Zusammenhänge verstehen.</h1>
-      <p className="lede">Vom Begriff zum Aha-Moment. In deinem Tempo.</p>
+      <h1>Lernen mit Beispielen.</h1>
+      <p className="lede">Wähle ein Thema. Erkunde das Beispiel und löse danach die kurze Übung.</p>
       <div className="tabs" aria-label="Lernmodule">
         {topics.map((t) => (
           <button
             key={t.id}
             aria-pressed={topic === t.id}
             className={topic === t.id ? 'active' : ''}
-            onClick={() => setTopic(t.id)}
+            onClick={() => onTopicChange(t.id)}
           >
             {t.title}
             {completed[t.id] && <Check size={15} />}
@@ -52,6 +54,29 @@ export function Learning({
           <h2>{current.title}</h2>
         </div>
         <span className="pill">01 — Verstehen</span>
+      </div>
+      <div className="lesson-guide">
+        <div>
+          <span className="eyebrow">SO FUNKTIONIERT DIESE LEKTION</span>
+          <h3>
+            {topic === 'marktformen'
+              ? 'Klicke eine Marktform in der Tabelle an.'
+              : 'Beantworte die Fragen zum Unternehmen.'}
+          </h3>
+          <p>
+            {topic === 'marktformen'
+              ? 'Links zählt die Zahl der Anbieter (Verkäufer), oben die Zahl der Nachfrager (Käufer). Zu jedem Feld siehst du eine Erklärung und ein Beispiel. Scrolle danach zur Mini-Aufgabe.'
+              : 'Wähle die passende Antwort im Entscheidungsbaum. Er führt dich Schritt für Schritt zur Kaufmannsart. Du kannst jederzeit einen Schritt zurückgehen.'}
+          </p>
+        </div>
+        <details>
+          <summary>Das lernst du hier</summary>
+          <ul>
+            {current.objectives.map((objective) => (
+              <li key={objective}>{objective}</li>
+            ))}
+          </ul>
+        </details>
       </div>
       {topic === 'marktformen' ? (
         <>
@@ -260,15 +285,25 @@ export function Learning({
         </>
       )}
       <div className="lesson-footer">
-        <button className="button secondary" onClick={() => onComplete(topic)}>
+        {completed[topic] && (
+          <p className="completion-message" role="status">
+            <Check size={17} />
+            Gespeichert. Übe jetzt mit Aufgaben zu diesem Thema.
+          </p>
+        )}
+        <button
+          className="button secondary"
+          disabled={!!completed[topic]}
+          onClick={() => onComplete(topic)}
+        >
           <Check size={16} />
           {completed[topic] ? 'Lektion abgeschlossen' : 'Lektion abschließen'}
         </button>
         <button className="button primary" onClick={() => onTrain(topic)}>
-          Wissen anwenden <ArrowRight size={16} />
+          Aufgaben zu diesem Thema üben <ArrowRight size={16} />
         </button>
         <button className="text-button" onClick={onExam}>
-          <CornerDownRight size={16} /> 03 — Ohne Hinweise prüfen
+          <CornerDownRight size={16} /> Zur Prüfungsübersicht
         </button>
       </div>
     </section>

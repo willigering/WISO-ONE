@@ -90,7 +90,13 @@ Der vorgegebene Schlüssel ist zentral: ab 92 % Note 1, ab 81 % Note 2, ab 67 % 
 - „Prüfungssicherheit“ ist eine Orientierung aus den letzten 20 geschlossenen Antworten pro Thema, keine statistische Bestehensprognose. Unbekannte Themen werden zuerst empfohlen, danach das Thema mit der niedrigsten Quote.
 - Eigene Übungsprüfung; keine offizielle IHK-Prüfung oder Zertifizierung.
 
-## Speicherung
+## Bedienung
+
+Die Startseite bietet einen konkreten nächsten Lernschritt sowie direkte Einstiege zum Lernen, Üben und Prüfen. Die Navigation verwendet durchgehend **Start · Lernen · Üben · Prüfung**; auf schmalen Ansichten ist sie dauerhaft am unteren Rand sichtbar. Eine Schrittleiste verbindet Verstehen, Üben und Prüfen. Kurze Bedienhinweise erklären Matrix, Entscheidungsbaum und die verschiedenen Aufgabeneingaben.
+
+Die aktuelle Ansicht und das gewählte Thema stehen im URL-Fragment, etwa `/#/lernen/kaufmann`. Direkte Links, Neuladen und Browser-Zurück funktionieren ohne Server-Routen. Eine laufende Trainingsrunde bleibt beim Wechsel zum Nachlesen innerhalb der geöffneten Anwendung erhalten; nach einem vollständigen Neuladen startet die Trainingsrunde neu. Bereits bewertete Antworten bleiben dauerhaft gespeichert. Prüfungen behalten weiterhin ihren vollständigen Bearbeitungsstand.
+
+## Speicherung des Lernstands
 
 `localStorage`, Schlüssel `wiso-one.progress.v1`, speichert abgeschlossene Lektionen, bis zu 2.000 geschlossene Antwortversuche einschließlich Sicherheit, Prüfungsverlauf, Antworten, Markierungen und Zeitstempel. Der Timer verwendet eine absolute Deadline und läuft beim Verlassen der Seite weiter. Beim nächsten Öffnen wird eine abgelaufene Prüfung abgegeben. Löschen von Browserdaten entfernt den Fortschritt. Für konsistente Daten nur einen aktiven Tab verwenden.
 
